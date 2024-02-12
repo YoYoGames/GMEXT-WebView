@@ -1,14 +1,19 @@
-[
-    {
-        "projectFile": "source/WebView_gml/WebView.yyp",
-        "extensionFile": "source/WebView_gml/extensions/WebView/WebView.yy",
-        "packageId": "com.yoyogames.webviewext",
-        "packageName": "WebView Ext",
-        "packageVersion": "1.0.0",
-        "includedFolders": null,
-        "includedResources": null,
-        "excludedFolders": null,
-        "excludedResources": null,
-        "format": "LTS22"
-    }
-]
+{
+    "gitHubUrl": "https://github.com/YoYoGames/GMEXT-WebView",
+    "projectFile": "source/WebView_gml/WebView.yyp",
+    "projectVersion": "LTS22",
+    "releaseTemplate": "templates/release_body.md",
+    "extensionMetaData": [
+        {
+            "extensionFile": "source/WebView_gml/extensions/WebView/WebView.yy",
+            "packageId": "com.yoyogames.webviewext",
+            "packageName": "WebView Ext",
+            "packageVersion": "1.0.0",
+            "packageFormat": "LTS22",
+            "includedFolders": null,
+            "includedResources": null,
+            "excludedFolders": null,
+            "excludedResources": null
+        }
+    ]
+}
