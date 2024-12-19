@@ -14,7 +14,7 @@
   "copyToTargets":562949953421324,
   "description":"",
   "exportToGame":true,
-  "extensionVersion":"1.0.0",
+  "extensionVersion":"1.0.1",
   "files":[
     {"$GMExtensionFile":"","%Name":"","constants":[],"copyToTargets":-1,"filename":"WebView.ext","final":"","functions":[
         {"$GMExtensionFunction":"","%Name":"WebView_Create","argCount":0,"args":[1,],"documentation":"","externalName":"WebView_Create","help":"WebView_Create(url)","hidden":false,"kind":4,"name":"WebView_Create","resourceType":"GMExtensionFunction","resourceVersion":"2.0","returnType":1,},
