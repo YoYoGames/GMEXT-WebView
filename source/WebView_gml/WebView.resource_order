@@ -1,0 +1,11 @@
+{
+  "FolderOrderSettings":[],
+  "ResourceOrderSettings":[
+    {"name":"Font_YoYo_30","order":1,"path":"fonts/Font_YoYo_30/Font_YoYo_30.yy",},
+    {"name":"Font_YoYo_50","order":2,"path":"fonts/Font_YoYo_50/Font_YoYo_50.yy",},
+    {"name":"Obj_YoYo_text","order":1,"path":"objects/Obj_YoYo_text/Obj_YoYo_text.yy",},
+    {"name":"Obj_YoYo_textbox","order":2,"path":"objects/Obj_YoYo_textbox/Obj_YoYo_textbox.yy",},
+    {"name":"Spr_YoYo_button","order":1,"path":"sprites/Spr_YoYo_button/Spr_YoYo_button.yy",},
+    {"name":"Spr_YoYo_textbox","order":2,"path":"sprites/Spr_YoYo_textbox/Spr_YoYo_textbox.yy",},
+  ],
+}
