@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ExtensionCore_runtime",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ExtensionCore_runtime",
+  "parent":{
+    "name":"ExtensionCore",
+    "path":"folders/WebView/ExtensionCore.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
