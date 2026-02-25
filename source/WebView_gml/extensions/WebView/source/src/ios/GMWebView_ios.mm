@@ -6,46 +6,6 @@ using namespace webviewcpp;
 
 @implementation GMWebView
 
-+ (void)load {
-    // 1) snapshot methods defined *directly* on the subclass
-    unsigned subCount = 0;
-    Method *subList = class_copyMethodList(self, &subCount);
-
-    // build a set of SELs the subclass already owns
-    CFMutableSetRef owned = CFSetCreateMutable(kCFAllocatorDefault, 0, NULL);
-    for (unsigned i = 0; i < subCount; ++i) {
-        SEL sel = method_getName(subList[i]);
-        CFSetAddValue(owned, sel);
-    }
-
-    // 2) walk the superclass’s instance methods
-    unsigned supCount = 0;
-    Method *supList = class_copyMethodList([GMWebViewInternal class], &supCount);
-
-    for (unsigned i = 0; i < supCount; ++i) {
-        SEL sel = method_getName(supList[i]);
-
-        // (optional) only copy your extension selectors
-        const char *name = sel_getName(sel);
-        if (!name || strncmp(name, "__EXT_NATIVE__", 13) != 0) continue;
-
-        // only add if NOT already defined on subclass
-        if (!CFSetContainsValue(owned, sel)) {
-            IMP imp = method_getImplementation(supList[i]);
-            const char *types = method_getTypeEncoding(supList[i]);
-            if (class_addMethod(self, sel, imp, types)) {
-                // remember we added it (avoid re-adding if +load ever runs twice)
-                CFSetAddValue(owned, sel);
-            }
-        }
-    }
-
-    // 3) cleanup
-    if (subList) free(subList);
-    if (supList) free(supList);
-    if (owned) CFRelease(owned);
-}
-
 - (void)webview_open_url:(std::optional<std::string_view>)url
 {
     GMWebViewManager::instance().open(std::string(url.value_or("")));
