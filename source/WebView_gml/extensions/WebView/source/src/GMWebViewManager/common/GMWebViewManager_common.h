@@ -17,7 +17,8 @@
 #pragma warning(pop)
 #endif
 
-extern std::shared_ptr<webview::webview> w_;
+// Global webview instance for Windows/Linux (not used by iOS/macOS)
+extern std::shared_ptr<webview::webview> g_webview_instance_;
 
 extern const char kInjectJS[];
 extern const char kYTPageName[];

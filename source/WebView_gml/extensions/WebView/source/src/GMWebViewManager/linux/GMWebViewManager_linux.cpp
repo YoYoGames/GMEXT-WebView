@@ -219,7 +219,7 @@ void _setBorderless(void* winPtr, bool on)
 void GMWebViewManager::ensure()
 {
     // Linux: create ONCE, keep loop alive. Never terminate on close().
-    if (w_ || (running_.load(std::memory_order_acquire) && ready_.load(std::memory_order_acquire)))
+    if (g_webview_instance_ || (running_.load(std::memory_order_acquire) && ready_.load(std::memory_order_acquire)))
         return;
 
     // If a previous thread exists but isn't running (shouldn't happen with keepalive),
@@ -253,7 +253,7 @@ void GMWebViewManager::ensure()
         // Publish instance + mark ready
         {
             std::lock_guard<std::mutex> lk(m_);
-            w_ = local;
+            g_webview_instance_ = local;
             ready_.store(true, std::memory_order_release);
         }
         cv_.notify_all();
@@ -279,7 +279,7 @@ void GMWebViewManager::ensure()
         // If run() ever returns (should normally only be at program exit)
         {
             std::lock_guard<std::mutex> lk(m_);
-            w_.reset();
+            g_webview_instance_.reset();
             ready_.store(false, std::memory_order_release);
             running_.store(false, std::memory_order_release);
             visible_.store(false, std::memory_order_release);
@@ -301,7 +301,7 @@ void GMWebViewManager::open(const std::string& url)
     std::shared_ptr<webview::webview> w;
     {
         std::lock_guard<std::mutex> lk(m_);
-        w = w_;
+        w = g_webview_instance_;
     }
     if (!w)
         return;
@@ -332,7 +332,7 @@ void GMWebViewManager::close()
     std::shared_ptr<webview::webview> w;
     {
         std::lock_guard<std::mutex> lk(m_);
-        w = w_;
+        w = g_webview_instance_;
     }
     if (!w)
         return;
@@ -343,12 +343,38 @@ void GMWebViewManager::close()
     }
 
     w->dispatch([this, w] {
-        // Stop media / JS UI
-        // (Use a couple of safe operations; failures are okay)
+        // Stop all media playback BEFORE navigating to about:blank
+        try {
+            const char* stopMediaJS =
+                "(function(){"
+                    "try{"
+                        "document.querySelectorAll('video, audio').forEach(function(m){"
+                            "m.pause();"
+                            "m.src='';"
+                            "m.load();"
+                        "});"
+                        "if(window.YT && window.YT.Player){"
+                            "document.querySelectorAll('iframe').forEach(function(f){"
+                                "try{"
+                                    "var p=new YT.Player(f);"
+                                    "p.stopVideo();"
+                                    "p.destroy();"
+                                "}catch(e){}"
+                            "});"
+                        "}"
+                    "}catch(e){}"
+                "})();";
+            w->eval(stopMediaJS);
+        } catch (...) {
+        }
+
+        // Remove UI buttons
         try {
             w->eval("if(window.GMUI){GMUI.remAll();}");
         } catch (...) {
         }
+
+        // Then navigate to blank
         try {
             w->navigate("about:blank");
         } catch (...) {
@@ -369,31 +395,49 @@ void GMWebViewManager::close()
 
 void GMWebViewManager::hide()
 {
-    auto w = w_;
+    std::shared_ptr<webview::webview> w;
+    {
+        std::lock_guard<std::mutex> lk(m_);
+        w = g_webview_instance_;
+    }
+    if (!w) return;
+
     dispatch([this, w] {
         auto r = w->window();
         if (r.has_value()) {
             _hideWindow(r.value());
-            visible_ = false;
+            visible_.store(false, std::memory_order_release);
         }
     });
 }
 
 void GMWebViewManager::show()
 {
-    auto w = w_;
+    std::shared_ptr<webview::webview> w;
+    {
+        std::lock_guard<std::mutex> lk(m_);
+        w = g_webview_instance_;
+    }
+    if (!w) return;
+
     dispatch([this, w] {
         auto r = w->window();
         if (r.has_value()) {
             _showWindow(r.value());
-            visible_ = true;
+            visible_.store(true, std::memory_order_release);
         }
     });
 }
 
 void GMWebViewManager::setBorderless(bool on)
 {
-    auto w = w_;
+    std::shared_ptr<webview::webview> w;
+    {
+        std::lock_guard<std::mutex> lk(m_);
+        w = g_webview_instance_;
+    }
+    if (!w) return;
+
     dispatch([w, on] {
         auto r = w->window();
         if (!r.has_value())

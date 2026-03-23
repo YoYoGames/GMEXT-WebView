@@ -739,9 +739,33 @@ void GMWebViewManager::close()
             btn_state_.clear();
         }
 
-        if (g.vc) [g.vc dismissViewControllerAnimated:NO completion:nil]; 
+        if (g.vc) [g.vc dismissViewControllerAnimated:NO completion:nil];
         if (g.nav) ((GMBridge*)g.nav).owner = nullptr;
         if (g.wk) {
+            // Stop all media playback before cleanup
+            NSString* stopMediaJS = @"(function(){"
+                "try{"
+                    "document.querySelectorAll('video, audio').forEach(function(m){"
+                        "m.pause();"
+                        "m.src='';"
+                        "m.load();"
+                    "});"
+                    "if(window.YT && window.YT.Player){"
+                        "document.querySelectorAll('iframe').forEach(function(f){"
+                            "try{"
+                                "var p=new YT.Player(f);"
+                                "p.stopVideo();"
+                                "p.destroy();"
+                            "}catch(e){}"
+                        "});"
+                    "}"
+                "}catch(e){}"
+            "})();";
+            [g.wk evaluateJavaScript:stopMediaJS completionHandler:nil];
+
+            // Load blank page to ensure all resources are released
+            [g.wk loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+
             WKUserContentController* uc = g.wk.configuration.userContentController;
             [uc removeScriptMessageHandlerForName:@"gm"];
             g.wk.navigationDelegate = nil;

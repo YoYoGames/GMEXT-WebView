@@ -568,12 +568,12 @@ void GMWebViewManager::ensure()
         // hidden / visible start mode
         if (start_mode_ == WebViewStartMode::Hidden) {
             [g.win orderOut:nil];
-            visible_ = false;
+            visible_.store(false, std::memory_order_release);
         }
         else
         {
             [g.win makeKeyAndOrderFront:nil];
-            visible_ = true;
+            visible_.store(true, std::memory_order_release);
         }
 
         // notify
@@ -643,8 +643,42 @@ void GMWebViewManager::close()
             std::lock_guard<std::mutex> lk(btn_state_mtx_);
             btn_state_.clear();
         }
-        
-        [g.wk stopLoading];
+
+        // Stop all media playback before cleanup
+        if (g.wk) {
+            NSString* stopMediaJS = @"(function(){"
+                "try{"
+                    "document.querySelectorAll('video, audio').forEach(function(m){"
+                        "m.pause();"
+                        "m.src='';"
+                        "m.load();"
+                    "});"
+                    "if(window.YT && window.YT.Player){"
+                        "document.querySelectorAll('iframe').forEach(function(f){"
+                            "try{"
+                                "var p=new YT.Player(f);"
+                                "p.stopVideo();"
+                                "p.destroy();"
+                            "}catch(e){}"
+                        "});"
+                    "}"
+                "}catch(e){}"
+            "})();";
+            [g.wk evaluateJavaScript:stopMediaJS completionHandler:nil];
+
+            // Load blank page to ensure all resources are released
+            [g.wk loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
+
+            [g.wk stopLoading];
+
+            // Remove from superview to help with cleanup
+            [g.wk removeFromSuperview];
+
+            // Clear delegates and message handlers
+            WKUserContentController* uc = g.wk.configuration.userContentController;
+            [uc removeScriptMessageHandlerForName:@"gm"];
+            g.wk.navigationDelegate = nil;
+        }
 
         g.win.delegate = nil;
         [g.win close];            // harmless if already closing

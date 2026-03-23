@@ -3,7 +3,8 @@
 
 using namespace webviewcpp;
 
-std::shared_ptr<webview::webview> w_ = nullptr;
+// Global webview instance for Windows/Linux (not used by iOS/macOS)
+std::shared_ptr<webview::webview> g_webview_instance_ = nullptr;
 
 const char kYTPageName[] = "youtube_iframe_api.html";
 
@@ -490,7 +491,7 @@ void GMWebViewManager::dispatch(const std::function<void()>& fn)
     if (destroying_.load(std::memory_order_acquire))
         return;
 
-    auto w = w_; // snapshot
+    auto w = g_webview_instance_; // snapshot
     if (!w)
         return;
 
@@ -679,19 +680,19 @@ void GMWebViewManager::loadLocal(const std::string& pathOrHtml, bool raw)
     if (raw) {
         std::string html = pathOrHtml;
         std::string uri = "data:text/html;base64," + b64encode(html);
-        dispatch_on(w_, [uri](webview::webview& w) { w.navigate(uri); });
+        dispatch_on(g_webview_instance_, [uri](webview::webview& w) { w.navigate(uri); });
     } else {
         std::string u = pathOrHtml;
         if (u.rfind("file://", 0) != 0)
             u = "file://" + u;
-        dispatch_on(w_, [u](webview::webview& w) { w.navigate(u); });
+        dispatch_on(g_webview_instance_, [u](webview::webview& w) { w.navigate(u); });
     }
 }
 
 void GMWebViewManager::loadBlank()
 {
     ensure();
-    dispatch_on(w_, [](webview::webview& w) { w.navigate("about:blank"); });
+    dispatch_on(g_webview_instance_, [](webview::webview& w) { w.navigate("about:blank"); });
 }
 
 static std::string yt_extract_id(const std::string& urlOrId)
@@ -794,12 +795,12 @@ std::string GMWebViewManager::params()
 void GMWebViewManager::evalJS(const std::string& js)
 {
     ensure();
-    dispatch_on(w_, [js](webview::webview& w) { w.eval(js); });
+    dispatch_on(g_webview_instance_, [js](webview::webview& w) { w.eval(js); });
 }
 
 void GMWebViewManager::evalJS_unsafe(const std::string& js)
 {
-    dispatch_on(w_, [js](webview::webview& w) { w.eval(js); });
+    dispatch_on(g_webview_instance_, [js](webview::webview& w) { w.eval(js); });
 }
 
 void GMWebViewManager::setJSCallback(const gm::wire::GMFunction& cb)
@@ -1134,8 +1135,8 @@ void GMWebViewManager::joinUiThread()
 GMWebViewManager::~GMWebViewManager()
 {
     // Don't create/eval anything just stop and join if needed.
-    if (running_ && w_) {
-        dispatch_on(w_, [](webview::webview& w) { w.terminate(); });
+    if (running_ && g_webview_instance_) {
+        dispatch_on(g_webview_instance_, [](webview::webview& w) { w.terminate(); });
     }
     joinUiThread();
 }

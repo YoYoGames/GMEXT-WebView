@@ -188,7 +188,7 @@ void GMWebViewManager::ensure()
 
         {
             std::lock_guard<std::mutex> lk(m_);
-            w_ = local;
+            g_webview_instance_ = local;
             ready_ = true;
 
             // flush pending safely
@@ -203,7 +203,7 @@ void GMWebViewManager::ensure()
 
         {
             std::lock_guard<std::mutex> lk(m_);
-            w_.reset();
+            g_webview_instance_.reset();
             ready_ = false;
             running_ = false;
         }
@@ -231,7 +231,7 @@ void GMWebViewManager::open(const std::string& url)
         std::shared_ptr<webview::webview> w;
         {
             std::lock_guard<std::mutex> lk(m_);
-            w = w_;
+            w = g_webview_instance_;
         }
         if (!w)
             return;
@@ -257,7 +257,7 @@ void GMWebViewManager::close()
 
     {
         std::lock_guard<std::mutex> lk(m_);
-        w = w_;
+        w = g_webview_instance_;
         if (w) {
             auto r = w->window();
             if (r.has_value())
@@ -287,7 +287,7 @@ void GMWebViewManager::close()
 
         {
             std::lock_guard<std::mutex> lk(m_);
-            w_.reset();
+            g_webview_instance_.reset();
             ready_.store(false, std::memory_order_release);
             running_.store(false, std::memory_order_release);
             loading_.store(false, std::memory_order_release);
@@ -309,7 +309,7 @@ void GMWebViewManager::hide()
         std::shared_ptr<webview::webview> w;
         {
             std::lock_guard<std::mutex> lk(m_);
-            w = w_;
+            w = g_webview_instance_;
         }
         if (!w)
             return;
@@ -328,7 +328,7 @@ void GMWebViewManager::show()
         std::shared_ptr<webview::webview> w;
         {
             std::lock_guard<std::mutex> lk(m_);
-            w = w_;
+            w = g_webview_instance_;
         }
         if (!w)
             return;
@@ -347,7 +347,7 @@ void GMWebViewManager::setBorderless(bool on)
         std::shared_ptr<webview::webview> w;
         {
             std::lock_guard<std::mutex> lk(m_);
-            w = w_;
+            w = g_webview_instance_;
         }
         if (!w)
             return;
