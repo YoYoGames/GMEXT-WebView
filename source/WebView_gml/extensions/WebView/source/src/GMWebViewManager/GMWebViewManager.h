@@ -62,13 +62,13 @@ public:
     void setBorderless(bool on);
 
     // info
-    std::string url();
-    std::string title();
-    bool isLoading();
-    bool isRunning();
-    bool isVisible();
-    std::string body();
-    std::string params();
+    std::string url() const;
+    std::string title() const;
+    bool isLoading() const;
+    bool isRunning() const;
+    bool isVisible() const;
+    std::string body() const;
+    std::string params() const;
 
     // js bridge
     void evalJS(const std::string& js);
@@ -132,7 +132,7 @@ private:
     std::unordered_map<int, ButtonState> btn_state_;
 
     std::thread ui_thread_;
-    std::mutex m_, cb_mtx_, btn_state_mtx_;
+    mutable std::mutex m_, cb_mtx_, btn_state_mtx_;
     std::string last_url_, last_title_, last_body_, last_params_;
     gm::wire::GMFunction js_callback_ = nullptr;
     std::condition_variable cv_;
