@@ -11,12 +11,14 @@
 #include <future> 
  
 #include "GMWebViewManager.h"
+#include "common/GMWebViewManager_utils.h"
 #include <nlohmann/json.hpp>
- 
-#import <UIKit/UIKit.h> 
-#import <WebKit/WebKit.h> 
- 
+
+#import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
+
 using namespace webviewcpp;
+using namespace webviewcpp::utils;
 
 #pragma mark - helpers 
 // ---------------------------------------------- 
