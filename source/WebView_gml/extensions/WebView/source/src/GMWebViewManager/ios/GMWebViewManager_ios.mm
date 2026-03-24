@@ -853,13 +853,33 @@ void GMWebViewManager::setBorderless(bool){ /* ignored on iOS */ }
 /* ----------------------------------------------------------- */ 
 #pragma mark - info getters 
  
-std::string GMWebViewManager::url()    { return last_url_;   } 
-std::string GMWebViewManager::title()  { return last_title_; } 
-std::string GMWebViewManager::body()   { return last_body_;  } 
-std::string GMWebViewManager::params() { return last_params_; } 
-bool   GMWebViewManager::isLoading() { return loading_; } 
-bool   GMWebViewManager::isRunning() { return running_; }
-bool   GMWebViewManager::isVisible() { return visible_; }
+std::string GMWebViewManager::url() const
+{
+    std::lock_guard<std::mutex> lk(m_);
+    return last_url_;
+}
+
+std::string GMWebViewManager::title() const
+{
+    std::lock_guard<std::mutex> lk(m_);
+    return last_title_;
+}
+
+std::string GMWebViewManager::body() const
+{
+    std::lock_guard<std::mutex> lk(m_);
+    return last_body_;
+}
+
+std::string GMWebViewManager::params() const
+{
+    std::lock_guard<std::mutex> lk(m_);
+    return last_params_;
+}
+
+bool GMWebViewManager::isLoading() const { return loading_.load(); }
+bool GMWebViewManager::isRunning() const { return running_.load(); }
+bool GMWebViewManager::isVisible() const { return visible_.load(); }
  
 /* ----------------------------------------------------------- */ 
 #pragma mark - JS / bridge  (identical to macOS) 
