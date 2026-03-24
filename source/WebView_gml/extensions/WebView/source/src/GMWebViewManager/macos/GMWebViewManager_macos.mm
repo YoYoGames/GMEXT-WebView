@@ -646,6 +646,9 @@ void GMWebViewManager::close()
 
         // Stop all media playback before cleanup
         if (g.wk) {
+            // Use synchronous approach: stop loading first, then stop media
+            [g.wk stopLoading];
+
             NSString* stopMediaJS = @"(function(){"
                 "try{"
                     "document.querySelectorAll('video, audio').forEach(function(m){"
@@ -664,12 +667,18 @@ void GMWebViewManager::close()
                     "}"
                 "}catch(e){}"
             "})();";
-            [g.wk evaluateJavaScript:stopMediaJS completionHandler:nil];
 
-            // Load blank page to ensure all resources are released
+            // Execute JS synchronously and wait for completion before proceeding
+            dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+            [g.wk evaluateJavaScript:stopMediaJS completionHandler:^(id result, NSError *error) {
+                dispatch_semaphore_signal(semaphore);
+            }];
+
+            // Wait up to 100ms for JavaScript to complete
+            dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 100 * NSEC_PER_MSEC));
+
+            // Now navigate to about:blank
             [g.wk loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
-
-            [g.wk stopLoading];
 
             // Remove from superview to help with cleanup
             [g.wk removeFromSuperview];
