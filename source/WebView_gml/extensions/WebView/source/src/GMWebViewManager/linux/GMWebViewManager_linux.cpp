@@ -25,6 +25,7 @@ static std::filesystem::path appassets_folder()
 // --- tiny local HTTP server (loopback only) ---
 namespace {
 std::once_flag g_yt_once;
+std::once_flag g_yt_atexit_once;  // Ensure atexit is only registered once
 std::atomic<bool> g_yt_running {false};
 std::atomic<int> g_yt_port {0};
 int g_listen_fd = -1;
@@ -175,7 +176,11 @@ static int start_loopback_server(const std::filesystem::path& root)
     int port = (int)ntohs(bound.sin_port);
 
     g_yt_thread = std::thread(yt_server_loop, root);
-    std::atexit(stop_yt_server);
+
+    // Register atexit handler only once (fallback cleanup at program termination)
+    std::call_once(g_yt_atexit_once, [] {
+        std::atexit(stop_yt_server);
+    });
 
     return port;
 }
