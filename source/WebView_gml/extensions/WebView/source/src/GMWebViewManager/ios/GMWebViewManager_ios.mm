@@ -80,24 +80,7 @@ static inline void runOnMain(dispatch_block_t b)
     else dispatch_async(dispatch_get_main_queue(), b); 
 }
 
-static bool extractFirstArgJson(const std::string& raw, std::string& first)
-{
-    try {
-        auto j = nlohmann::json::parse(raw);
-        if (j.is_array() && !j.empty() && j[0].is_string()) {
-            first = j[0].get<std::string>();
-            return true;
-        }
-        if (j.is_string()) {
-            first = j.get<std::string>();
-            return true;
-        }
-    } catch (...) {
-    }
-    return false;
-}
- 
-// ────────────────────────────────────────────────────────────── 
+// ──────────────────────────────────────────────────────────────
 //  constant JS that injects GMUI (identical to Windows build) 
 // ────────────────────────────────────────────────────────────── 
 static const char kInjectJS[] = R"JS( 
@@ -445,15 +428,7 @@ static const char kInjectJS[] = R"JS(
             remAll:function(){ document.querySelectorAll('[id^=gm_btn_]').forEach(e=>e.remove()); }
         }; 
     })(); 
-)JS"; 
- 
-// default close-button SVG  (copied from Windows file) 
-static const char *kDefaultBtnSvg = 
-"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>" 
-    "<circle cx='50' cy='50' r='50' fill='rgba(0,0,0,0.66)'/>" 
-    "<path d='M30 30 L70 70 M70 30 L30 70' " 
-    "stroke='white' stroke-width='12' stroke-linecap='round'/>" 
-"</svg>";
+)JS";
 
 // Youtube iframe API
 static const char* kIOS_YT_IFrameApiHostHTML = R"HTML(
@@ -796,42 +771,9 @@ void GMWebViewManager::close()
     }); 
 } 
  
-/* ----------------------------------------------------------- */ 
-#pragma mark - content helpers  (local / blank / YouTube / offline) 
- 
-static std::string b64encode(const std::string& s) { 
-    static const char t[] = 
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"; 
-    std::string out; 
-    out.reserve(((s.size() + 2) / 3) * 4); 
-    size_t i = 0; 
-    while (i + 3 <= s.size()) { 
-        // pull each byte in its own statement 
-        uint32_t b0 = static_cast<uint8_t>(s[i++]); 
-        uint32_t b1 = static_cast<uint8_t>(s[i++]); 
-        uint32_t b2 = static_cast<uint8_t>(s[i++]); 
- 
-        uint32_t v = (b0 << 16) | (b1 << 8) | b2; 
-        out.push_back(t[(v >> 18) & 63]); 
-        out.push_back(t[(v >> 12) & 63]); 
-        out.push_back(t[(v >> 6)  & 63]); 
-        out.push_back(t[v & 63]); 
-    } 
-    // handle remaining 1 or 2 bytes (unchanged) 
-    size_t rem = s.size() - i; 
-    if (rem) { 
-        uint32_t v = static_cast<uint8_t>(s[i++]) << 16; 
-        if (rem == 2) { 
-            v |= static_cast<uint8_t>(s[i++]) << 8; 
-        } 
-        out.push_back(t[(v >> 18) & 63]); 
-        out.push_back(t[(v >> 12) & 63]); 
-        out.push_back(rem == 2 ? t[(v >> 6) & 63] : '='); 
-        out.push_back('='); 
-    } 
-    return out; 
-} 
- 
+/* ----------------------------------------------------------- */
+#pragma mark - content helpers  (local / blank / YouTube / offline)
+
 void GMWebViewManager::loadLocal(const std::string &src, bool rawHTML) 
 { 
     ensure(); 
@@ -862,41 +804,6 @@ static inline void wk_load_html_with_base(WKWebView* wk, const std::string& html
     NSString* nsHtml = [NSString stringWithUTF8String:html.c_str()];
     NSURL* nsBase = [NSURL URLWithString:[NSString stringWithUTF8String:base.c_str()]];
     [wk loadHTMLString:nsHtml baseURL:nsBase];
-}
-
-static std::string yt_extract_id(const std::string& urlOrId)
-{
-    const std::string s = urlOrId;
-
-    // If it's already a bare ID (11 chars, no URL-ish chars), accept it.
-    if (s.size() == 11 && s.find_first_of("?/&=#") == std::string::npos)
-        return s;
-
-    auto take_token = [&](size_t start) -> std::string {
-        if (start == std::string::npos) return {};
-        size_t end = s.find_first_of("&#?&/\"", start);
-        std::string tok = s.substr(start, end == std::string::npos ? std::string::npos : end - start);
-        // IDs are 11 chars, but be defensive.
-        return tok.size() >= 11 ? tok.substr(0, 11) : tok;
-    };
-
-    // watch?v=VIDEO_ID
-    if (auto p = s.find("v="); p != std::string::npos)
-        return take_token(p + 2);
-
-    // youtu.be/VIDEO_ID
-    if (auto p = s.find("youtu.be/"); p != std::string::npos)
-        return take_token(p + 9);
-
-    // youtube.com/embed/VIDEO_ID
-    if (auto p = s.find("/embed/"); p != std::string::npos)
-        return take_token(p + 7);
-
-    // youtube-nocookie.com/embed/VIDEO_ID
-    if (auto p = s.find("youtube-nocookie.com/embed/"); p != std::string::npos)
-        return take_token(p + std::string("youtube-nocookie.com/embed/").size());
-
-    return {};
 }
 
 void GMWebViewManager::loadYouTube(const std::string& idOrUrl)
@@ -980,7 +887,7 @@ void GMWebViewManager::setJSCallback(const gm::wire::GMFunction &cb)
 void GMWebViewManager::onInvoke(const std::string &raw) 
 {
     std::string msg;
-    if (!extractFirstArgJson(raw, msg)) {
+    if (!extract_first_arg_json(raw, msg)) {
         msg = raw; // worst-case fallback
     }
     /*  The JavaScript that we inject posts strings back via
@@ -1118,53 +1025,14 @@ void GMWebViewManager::requestDestroyFromDom()
     close(); 
 } 
  
-/* ----------------------------------------------------------- */ 
-#pragma mark - overlay buttons  (identical JS calls) 
- 
-static std::string when_ready(const std::string& body) { 
-    return "(function W(){ if(window.GMUI && document.body){ " + body + 
-        " } else { setTimeout(W,50); } })();"; 
-} 
- 
-static std::string when_ready_el(int handle, const std::string& body) { 
-    return "(function W(){" 
-        " if (window.GMUI) {" 
-        "   var el = document.getElementById('gm_btn_" + std::to_string(handle) + "');" 
-        "   if (el) { " + body + " return; }" 
-        " }" 
-        " setTimeout(W,50);" 
-        "})();"; 
-} 
-  
-static std::string loadFile(const std::string& p){ 
-    std::ifstream f(p, std::ios::binary|std::ios::ate); 
-    if(!f) return{}; 
-    auto sz=f.tellg(); f.seekg(0); 
-    std::string s(sz,'\0'); f.read(&s[0],sz); return s; 
-} 
- 
-static std::string computeButtonImage(WebViewButtonAssetType assetType, const std::string& asset) {
-    switch (assetType) {
-    case WebViewButtonAssetType::DefaultIcon:
-        return kDefaultBtnSvg;
-    case WebViewButtonAssetType::FilePath: {
-        auto raw = loadFile(asset);
-        return "data:image/png;base64," + b64encode(raw);
-    }
-    case WebViewButtonAssetType::Base64Data:
-        return "data:image/png;base64," + asset;
-    case WebViewButtonAssetType::RawData:
-        return asset;
-    }
-
-    return asset;
-}
+/* ----------------------------------------------------------- */
+#pragma mark - overlay buttons  (identical JS calls)
 
 int GMWebViewManager::buttonCreate(int sizeDp, int gravity, WebViewButtonAssetType assetType, const std::string& asset) 
 { 
     ensure(); 
     int handle = next_handle_++; 
-    std::string src = computeButtonImage(assetType, asset);
+    std::string src = compute_button_image(assetType, asset);
 
     {
         std::lock_guard<std::mutex> lk(btn_state_mtx_);
@@ -1322,7 +1190,7 @@ void GMWebViewManager::buttonHide(int handle)
  
 void GMWebViewManager::buttonSetAsset(int handle, WebViewButtonAssetType assetType, const std::string& asset) 
 {
-    std::string src = computeButtonImage(assetType, asset);
+    std::string src = compute_button_image(assetType, asset);
 
     {
         std::lock_guard<std::mutex> lk(btn_state_mtx_);
