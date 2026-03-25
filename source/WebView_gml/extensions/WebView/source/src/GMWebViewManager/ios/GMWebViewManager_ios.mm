@@ -16,6 +16,7 @@
 
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
+#import <AVFoundation/AVFoundation.h>
 
 // GameMaker-provided externals
 extern "C" UIViewController *g_controller;
@@ -675,6 +676,13 @@ void GMWebViewManager::close()
             btn_state_.clear();
         }
 
+        // Dismiss keyboard and blur inputs BEFORE dismissing view controller
+        if (g.wk) {
+            [g.wk endEditing:YES];
+            [g.wk evaluateJavaScript:@"document.activeElement && document.activeElement.blur();"
+                   completionHandler:nil];
+        }
+
         if (g.vc) [g.vc dismissViewControllerAnimated:NO completion:nil];
         if (g.nav) ((GMBridge*)g.nav).owner = nullptr;
         if (g.wk) {
@@ -706,6 +714,16 @@ void GMWebViewManager::close()
 
             // Wait up to 100ms for JavaScript to complete
             dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 100 * NSEC_PER_MSEC));
+
+            // Pause all media playback at the WKWebView level (iOS 15.0+)
+            if (@available(iOS 15.0, *)) {
+                [g.wk pauseAllMediaPlayback:nil];
+            }
+
+            // Also suspend all media (iOS 14.5+)
+            if (@available(iOS 14.5, *)) {
+                [g.wk setAllMediaPlaybackSuspended:YES completionHandler:nil];
+            }
 
             // Now navigate to about:blank
             [g.wk loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"about:blank"]]];
