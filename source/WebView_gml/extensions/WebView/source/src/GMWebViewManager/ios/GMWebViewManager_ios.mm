@@ -17,61 +17,20 @@
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
 
+// GameMaker-provided externals
+extern "C" UIViewController *g_controller;
+extern "C" UIView *g_glView;
+
 using namespace webviewcpp;
 using namespace webviewcpp::utils;
 
-#pragma mark - helpers 
-// ---------------------------------------------- 
-
-static UIWindow *gm_activeWindow()
-{
-    UIApplication *app = UIApplication.sharedApplication;
-
-    if (@available(iOS 13.0, *)) {
-        for (UIScene *scene in app.connectedScenes) {
-            if (scene.activationState != UISceneActivationStateForegroundActive) continue;
-            if (![scene isKindOfClass:[UIWindowScene class]]) continue;
-
-            UIWindowScene *ws = (UIWindowScene *)scene;
-
-            // Prefer the key window within this scene
-            for (UIWindow *w in ws.windows) {
-                if (w.isKeyWindow) return w;
-            }
-            // Fallback: first normal window
-            if (ws.windows.count > 0) return ws.windows.firstObject;
-        }
-    }
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    // iOS 12 fallback (single scene)
-    return app.keyWindow ?: app.windows.firstObject;
-#pragma clang diagnostic pop
-}
-
-static UIViewController *gm_topViewController(UIViewController *root)
-{
-    UIViewController *vc = root;
-    while (vc.presentedViewController) vc = vc.presentedViewController;
-
-    if ([vc isKindOfClass:[UINavigationController class]]) {
-        UINavigationController *nav = (UINavigationController *)vc;
-        return nav.visibleViewController ?: nav;
-    }
-    if ([vc isKindOfClass:[UITabBarController class]]) {
-        UITabBarController *tab = (UITabBarController *)vc;
-        return tab.selectedViewController ?: tab;
-    }
-    return vc;
-}
+#pragma mark - helpers
+// ----------------------------------------------
 
 static UIViewController *gm_presentingController()
 {
-    UIWindow *w = gm_activeWindow();
-    UIViewController *root = w.rootViewController;
-    if (!root) return nil;
-    return gm_topViewController(root);
+    // Use GameMaker's provided view controller directly
+    return g_controller;
 }
 
 static inline void runOnMain(dispatch_block_t b) 
