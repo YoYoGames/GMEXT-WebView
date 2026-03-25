@@ -29,6 +29,8 @@ file(MAKE_DIRECTORY "${_BUNDLE_DIR}")
 # Helper: env for ALL ruby/bundler invocations
 set(_ENV_CMD ${CMAKE_COMMAND} -E env
   "BUNDLE_GEMFILE=${_GEMFILE}"
+  "BUNDLE_PATH=${_BUNDLE_DIR}"
+  "BUNDLE_DISABLE_SHARED_GEMS=true"
   "GEM_HOME=${_LOCAL_GEM_HOME}"
   "GEM_PATH=${_LOCAL_GEM_HOME}"
   "PATH=${_LOCAL_GEM_BIN}:$ENV{PATH}"
@@ -92,7 +94,7 @@ endif()
 
 # --- Run integrator using the bundled gems ---
 execute_process(
-  COMMAND ${_ENV_CMD} "${RUBY_EXECUTABLE}" -S bundle exec ruby
+  COMMAND ${_ENV_CMD} "${RUBY_EXECUTABLE}" -S bundle exec "${RUBY_EXECUTABLE}"
     "${CMAKE_CURRENT_LIST_DIR}/extgen_integrate_gamemaker_xcode.rb"
       --gm "${EXT_GM_XCODEPROJ}"
       --gm-target "${EXT_GM_APP_TARGET}"

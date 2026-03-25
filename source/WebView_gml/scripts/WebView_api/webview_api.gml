@@ -174,7 +174,7 @@ function webview_load_youtube(_uid)
 
 
 /**
- * @param {Constant.WebViewStartMode} _mode
+ * @param {Enum.WebViewStartMode} _mode
  */
 function webview_set_start_mode(_mode)
 {
@@ -272,7 +272,7 @@ function webview_set_js_callback(_cb)
 /**
  * @param {Real} _size_dp
  * @param {Real} _gravity
- * @param {Constant.WebViewButtonAssetType} _asset_type
+ * @param {Enum.WebViewButtonAssetType} _asset_type
  * @param {String} _asset
  * @returns {Real} 
  */
@@ -348,7 +348,7 @@ function webview_button_create(_size_dp, _gravity, _asset_type, _asset)
 
 /**
  * @param {Real} _handle
- * @param {Constant.WebViewButtonAssetType} _asset_type
+ * @param {Enum.WebViewButtonAssetType} _asset_type
  * @param {String} _asset
  */
 function webview_button_set_asset(_handle, _asset_type, _asset)

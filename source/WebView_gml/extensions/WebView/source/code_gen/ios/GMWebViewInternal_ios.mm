@@ -1,6 +1,7 @@
 // ##### extgen :: Auto-generated file do not edit!! #####
 
 #import <objc/runtime.h>
+#import "core/GMExtUtils.h"
 #import "GMWebViewInternal_ios.h"
 
 

@@ -49,7 +49,7 @@
 
 /**
  * @function_partial webview_set_start_mode
- * @param {Constant.WebViewStartMode} mode
+ * @param {Enum.WebViewStartMode} mode
  * @function_end 
  */
 
@@ -123,7 +123,7 @@
  * @function_partial webview_button_create
  * @param {Real} size_dp
  * @param {Real} gravity
- * @param {Constant.WebViewButtonAssetType} [asset_type]
+ * @param {Enum.WebViewButtonAssetType} [asset_type]
  * @param {String} [asset]
  * @returns {Real} 
  * @function_end 
@@ -196,7 +196,7 @@
 /**
  * @function_partial webview_button_set_asset
  * @param {Real} handle
- * @param {Constant.WebViewButtonAssetType} asset_type
+ * @param {Enum.WebViewButtonAssetType} asset_type
  * @param {String} [asset]
  * @function_end 
  */
@@ -214,7 +214,7 @@
  */
 
 /**
- * @const_partial WebViewJavaScriptEvent
+ * @enum_partial WebViewJavaScriptEvent
  * @member OnUrlChange
  * @member OnBodyChange
  * @member OnTitleChange
@@ -222,27 +222,27 @@
  * @member OnPageLoadStart
  * @member OnPageLoadEnd
  * @member OnCustomPost
- * @const_end 
+ * @enum_end 
  */
 
 /**
- * @const_partial WebViewStartMode
+ * @enum_partial WebViewStartMode
  * @member Hidden
  * @member Visible
- * @const_end 
+ * @enum_end 
  */
 
 /**
- * @const_partial WebViewButtonAssetType
+ * @enum_partial WebViewButtonAssetType
  * @member DefaultIcon
  * @member FilePath
  * @member Base64Data
  * @member RawData
- * @const_end 
+ * @enum_end 
  */
 
 /**
- * @const_partial WebViewButtonGravity
+ * @enum_partial WebViewButtonGravity
  * @member Left
  * @member Right
  * @member Top
@@ -252,6 +252,11 @@
  * @member CenterHorizontal
  * @member CenterVertical
  * @member Center
+ * @enum_end 
+ */
+
+/**
+ * @const_partial macros
  * @const_end 
  */
 

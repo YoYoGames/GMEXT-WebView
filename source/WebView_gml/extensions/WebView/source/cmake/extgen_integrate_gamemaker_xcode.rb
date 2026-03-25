@@ -164,7 +164,7 @@ entry = refs.find { |h| (h[:project_ref] || h["project_ref"]).uuid == subproj_re
 abort_msg("Phase 2: projectReferences entry missing") unless entry
 
 products_group = (entry[:product_group] || entry["product_group"])
-abort_msg("Phase 2: Products group object missing for uuid #{pg_uuid}") unless products_group
+abort_msg("Phase 2: Products group object missing") unless products_group
 
 # 3) PBXContainerItemProxy (container_portal MUST be the PBXFileReference object)
 container_proxy = gm_proj.objects.find do |obj|
