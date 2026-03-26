@@ -7,12 +7,19 @@ This extension will work both with Android and iOS platform exports.
 
 ANDROID SOURCE: `source/WebView_gml/extensions/WebView/AndroidSource/Java/`
 
-IOS SOURCE: `source/WebView_gml/extensions/WebView/iOSSource/`
-
+IOS SOURCE: `source/WebView_gml/extensions/WebView/source/src/ios` (entry point)
+MACOS SOURCE: `source/WebView_gml/extensions/WebView/source/src/native` (entry point)
+WINDOWS SOURCE: `source/WebView_gml/extensions/WebView/source/src/native` (entry point)
+LINUX SOURCE: `source/WebView_gml/extensions/WebView/source/src/native` (entry point)
 
 ---
 
 ## Important
+
+> [!IMPORTANT]
+> ⚠️ The API has been completely redesigned.
+> This version is **not compatible with 1.x.x releases** and will require code updates.
+> Please review the updated documentation before upgrading.
 
 Do not download from the **main branch** this branch is a work in place branch and probably has features that might be broken or not working properly, please download from the releases panel (right side instead).
 
