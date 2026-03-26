@@ -46,7 +46,7 @@
     {"id":{"name":"obj_webview_youtube","path":"objects/obj_webview_youtube/obj_webview_youtube.yy",},},
     {"id":{"name":"obj_webview","path":"objects/obj_webview/obj_webview.yy",},},
     {"id":{"name":"Room_WebView","path":"rooms/Room_WebView/Room_WebView.yy",},},
-    {"id":{"name":"ExtensionCore_runtime","path":"scripts/ExtensionCore_runtime/ExtensionCore_runtime.yy",},},
+    {"id":{"name":"ExtensionCore_api","path":"scripts/ExtensionCore_api/ExtensionCore_api.yy",},},
     {"id":{"name":"WebView_api","path":"scripts/WebView_api/WebView_api.yy",},},
     {"id":{"name":"spr_gm_background","path":"sprites/spr_gm_background/spr_gm_background.yy",},},
     {"id":{"name":"spr_gm_button","path":"sprites/spr_gm_button/spr_gm_button.yy",},},
