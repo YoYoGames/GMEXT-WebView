@@ -3,7 +3,7 @@ Repository for GameMaker's WebView Extension
 
 This repository was created with the intent of presenting users with the latest version available of the extension (even previous to marketplace updates) and also provide a way for the community to contribute with bug fixes and feature implementation.
 
-This extension will work both with Android and iOS platform exports.
+This extension will work with Android and iOS platform exports and also desktop targets (Windows, MacOS, Linux).
 
 ANDROID SOURCE: `source/WebView_gml/extensions/WebView/AndroidSource/Java/`
 
