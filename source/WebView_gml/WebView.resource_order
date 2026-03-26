@@ -1,16 +1,17 @@
 {
   "FolderOrderSettings":[
-    {"name":"GM Extensions Assets","order":2,"path":"folders/GM Extensions Assets.yy",},
+    {"name":"GM Extensions Assets","order":5,"path":"folders/GM Extensions Assets.yy",},
     {"name":"Font","order":1,"path":"folders/GM Extensions Assets/Font.yy",},
     {"name":"Objects","order":2,"path":"folders/GM Extensions Assets/Objects.yy",},
     {"name":"Sprites","order":3,"path":"folders/GM Extensions Assets/Sprites.yy",},
+    {"name":"WebView","order":1,"path":"folders/WebView.yy",},
     {"name":"ExtensionCore","order":1,"path":"folders/WebView/ExtensionCore.yy",},
   ],
   "ResourceOrderSettings":[
     {"name":"WebView","order":1,"path":"extensions/WebView/WebView.yy",},
     {"name":"fnt_gm_20","order":1,"path":"fonts/fnt_gm_20/fnt_gm_20.yy",},
     {"name":"fnt_gm_30","order":2,"path":"fonts/fnt_gm_30/fnt_gm_30.yy",},
-    {"name":"README","order":1,"path":"notes/README/README.yy",},
+    {"name":"README","order":4,"path":"notes/README/README.yy",},
     {"name":"obj_gm_text","order":1,"path":"objects/obj_gm_text/obj_gm_text.yy",},
     {"name":"obj_gm_textbox","order":2,"path":"objects/obj_gm_textbox/obj_gm_textbox.yy",},
     {"name":"obj_webview_gamemaker","order":1,"path":"objects/obj_webview_gamemaker/obj_webview_gamemaker.yy",},

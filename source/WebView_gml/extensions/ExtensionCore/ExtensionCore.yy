@@ -25,7 +25,7 @@
   "installdir":"",
   "iosCocoaPodDependencies":"",
   "iosCocoaPods":"",
-  "ioscodeinjection":"\r\n<YYIosBuildSettingsInjection>\r\nSWIFT_OBJC_INTEROP_MODE = objcxx;\r\n</YYIosBuildSettingsInjection>",
+  "ioscodeinjection":"\r\n<YYIosBuildSettingsInjection>\r\nSWIFT_OBJC_INTEROP_MODE = objcxx;\r\n</YYIosBuildSettingsInjection>\r\n\r\n<YYIosBuildSettingsInjection>\r\n\"LD_RUNPATH_SEARCH_PATHS[arch=*]\"= (\r\n    \"$(inherited)\",\r\n    \"$(LD_RUNPATH_SEARCH_PATHS_$(IS_MACCATALYST))\",\r\n    \"@executable_path/Frameworks\",\r\n    \"@loader_path/Frameworks\",\r\n);\r\n</YYIosBuildSettingsInjection>",
   "iosdelegatename":"",
   "iosplistinject":null,
   "iosProps":true,

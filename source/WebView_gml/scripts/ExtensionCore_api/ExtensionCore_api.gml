@@ -203,6 +203,19 @@ function __ext_core_get_ret_buffer(_request_size = undefined) {
 	return __internal_ret;
 }
 
+/// @desc Returns the global buffer used for handling async calls from extensions.
+/// @param {Real} _request_size Request for the buffer to be resized
+/// @returns {Id.Buffer}
+/// @ignore
+function __ext_core_get_async_buffer(_request_size = undefined) {
+	static __internal_async = buffer_create(EXT_CORE_GM_BUFFER_RETURN_SIZE, buffer_grow, 1);
+	if (!is_undefined(_request_size)) buffer_resize(__internal_async, _request_size);
+	
+	buffer_seek(__internal_async, buffer_seek_start, 0);
+	buffer_poke(__internal_async, 0, buffer_u8, EXT_CORE_GM_TYPE_UNDEFINED);
+	return __internal_async;
+}
+
 /// @desc Returns the map that keeps all the registered GML side function references passed to extensions.
 /// @returns {Id.DsMap}
 /// @ignore
@@ -280,7 +293,7 @@ function __ext_core_function_register(_callable, _dispatcher) {
 function __ext_core_function_dispatch_calls(_handler, _decoders) {
 
     static _dummy_context = {};
-	var _buf = __ext_core_get_ret_buffer();
+	var _buf = __ext_core_get_async_buffer();
 	var _size = _handler(buffer_get_address(_buf), buffer_get_size(_buf));
 		
 	// Nothing to handle
@@ -289,7 +302,7 @@ function __ext_core_function_dispatch_calls(_handler, _decoders) {
 	// Not enough space in the buffer
 	if (_size < 0) {
 		// Request a buffer resize
-		_buf = __ext_core_get_ret_buffer(-_size + 3 /* 1 type + 2 size */);
+		_buf = __ext_core_get_async_buffer(-_size + 3 /* 1 type + 2 size */);
 		// This call will always succeed cus it will get the temp packed array
 		_handler(buffer_get_address(_buf), buffer_get_size(_buf));
 	}
@@ -320,7 +333,7 @@ function __ext_core_function_dispatch_calls(_handler, _decoders) {
 			case 2: // release
                 var _ref_count = --_ref[1 /* ref count */];
                 if (_ref_count <= 0) {
-    				ds_map_delete(_ref_map, _ref); // Remove the entry from the map
+    				ds_map_delete(_ref_map, _handle); // Remove the entry from the map
                 }
                 _released++;
 				break;
