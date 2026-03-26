@@ -23,12 +23,13 @@
   ],
   "ForcedPrefabProjectReferences":[],
   "IncludedFiles":[
+    {"$GMIncludedFile":"","%Name":"GMEXT-WebView.html","CopyToMask":0,"filePath":"datafiles","name":"GMEXT-WebView.html","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
     {"$GMIncludedFile":"","%Name":"img_close.png","CopyToMask":-1,"filePath":"datafiles","name":"img_close.png","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.1400.4.985",
+    "IDEVersion":"2024.1400.4.1020",
   },
   "name":"WebView",
   "resources":[
